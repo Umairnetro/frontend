@@ -37,7 +37,6 @@ const SignUp = () => {
         </div>
 
         <button
-          onClick={handleSignUp}
           className="bg-[#2c4646] text-white px-5 py-2 rounded-full border-2 border-[#2c4646] hover:bg-transparent hover:text-[#2c4646] duration-300 self-center"
         >
           Sign up
