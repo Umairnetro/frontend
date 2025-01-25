@@ -1,61 +1,9 @@
-import { Link, useNavigate } from "react-router-dom";
-import Loader from "./Loader";
-import { useContext, useEffect, useState } from "react";
-import { AuthContext } from "../context/AuthContext";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { Link } from "react-router-dom";
+import { useState } from "react";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const {
-    showLoader,
-    setShowLoader,
-    showMessage,
-    setShowMessage,
-    auth,
-    authLoader,
-    setAuthLoader,
-    currentUser,
-  } = useContext(AuthContext);
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    setShowMessage(null);
-  }, []);
-
-  const handleLogin = async () => {
-    setShowLoader(true);
-    try {
-      const userCredential = await signInWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
-      // Signed in
-      const user = userCredential.user;
-      console.log(user);
-      navigate("/dashboard");
-    } catch (error) {
-      console.log(error.code);
-
-      if (error.code === "auth/invalid-email") {
-        setShowMessage("please enter a valid email");
-      } else if (error.code === "auth/invalid-credential") {
-        setShowMessage("email or password is incorrect");
-      }
-    } finally {
-      setShowLoader(false);
-    }
-  };
-
-  useEffect(() => {
-    setAuthLoader(true);
-    if (authLoader && currentUser) {
-      navigate("/dashboard");
-      console.log("User not logged in");
-      console.log(currentUser);
-    }
-  }, [currentUser, authLoader, navigate]);
 
   return (
     <>
@@ -76,9 +24,6 @@ const Login = () => {
             placeholder="password"
             onChange={(e) => setPassword(e.target.value)}
           />
-          {showMessage && (
-            <p className="text-red-500 before:content-['*']">{showMessage}</p>
-          )}
         </div>
 
         <button
@@ -92,13 +37,11 @@ const Login = () => {
         Don't have an account?&nbsp;
         <Link
           to="/signup"
-          onClick={() => setShowMessage("")}
           className="hover:text-gray-400 underline"
         >
           Sign Up
         </Link>
       </p>
-      {showLoader && <Loader />}
     </>
   );
 };

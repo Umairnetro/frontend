@@ -1,87 +1,10 @@
-import { useContext, useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
-import Loader from "./Loader";
-import { useAuth } from "../context/AuthContext";
-import { doc, setDoc } from "firebase/firestore";
-import { db } from "../config/firebase";
+import { useState } from "react";
+import { Link } from "react-router-dom";
 
 const SignUp = () => {
-  const {
-    auth,
-    showMessage,
-    setShowMessage,
-    showLoader,
-    setShowLoader,
-    setAuthLoader,
-    authLoader,
-    currentUser,
-  } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
-
-  const navigate = useNavigate();
-
-  const handleSignUp = async () => {
-    if (!username & !email && !password) {
-      setShowMessage("Please fill in all fields.");
-      return;
-    }
-
-    if (!username || username.length < 3) {
-      setShowMessage("Username must be at least 3 characters long.");
-      return;
-    }
-
-    try {
-      setShowLoader(true);
-      const userCredential = await createUserWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
-
-      const user = userCredential.user;
-
-      console.log("User object:", user);
-
-      await updateProfile(user, {
-        displayName: username,
-      });
-
-      await setDoc(doc(db, "users", user.uid), {
-        uid: user.uid,
-        email: user.email,
-        displayName: username,
-        createdDate: new Date(),
-      });
-
-      setShowMessage("Sign up successful");
-      navigate("/login");
-    } catch (error) {
-      console.log(error);
-
-      if (error.code === "auth/email-already-in-use") {
-        setShowMessage("Email already in use");
-      } else if (error.code === "auth/invalid-email") {
-        setShowMessage("Please enter a valid email");
-      } else {
-        setShowMessage("Something went wrong, please try again");
-      }
-    } finally {
-      setShowLoader(false);
-    }
-  };
-
-  useEffect(() => {
-    setAuthLoader(true);
-    if (authLoader && currentUser) {
-      navigate("/dashboard");
-      console.log("User not logged in");
-      console.log(currentUser);
-    }
-  }, [currentUser, authLoader, navigate]);
 
   return (
     <>
@@ -111,9 +34,6 @@ const SignUp = () => {
             required
             onChange={(e) => setPassword(e.target.value)}
           />
-          {showMessage && (
-            <p className="text-red-500 before:content-['*']">{showMessage}</p>
-          )}
         </div>
 
         <button
@@ -125,15 +45,10 @@ const SignUp = () => {
       </div>
       <p className="mt-2">
         Already have an account?&nbsp;
-        <Link
-          to="/login"
-          onClick={() => setShowMessage("")}
-          className="hover:text-gray-400 underline"
-        >
+        <Link to="/login" className="hover:text-gray-400 underline">
           Login
         </Link>
       </p>
-      {showLoader && <Loader />}
     </>
   );
 };
